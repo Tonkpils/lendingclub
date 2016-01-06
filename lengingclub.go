@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -53,6 +55,15 @@ func (c *Client) newRequest(method, urlStr string, body io.Reader) (*http.Reques
 	return req, nil
 }
 
+func debug(bdy io.Reader) {
+	bs, err := ioutil.ReadAll(bdy)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Fatal(string(bs))
+}
+
 func (c *Client) processResponse(res *http.Response, body interface{}) error {
 	switch res.StatusCode {
 	case http.StatusOK:
@@ -60,11 +71,18 @@ func (c *Client) processResponse(res *http.Response, body interface{}) error {
 			return err
 		}
 	case http.StatusBadRequest:
+		log.Println("BAD REQUEST")
+		debug(res.Body)
 	case http.StatusForbidden:
+		log.Println("FORBIDDEN")
+		debug(res.Body)
 	case http.StatusUnauthorized:
 		return errors.New("unauthorized")
 	case http.StatusNotFound:
+		log.Println("Not Found")
+		debug(res.Body)
 	case http.StatusInternalServerError:
+		return errors.New(res.Status)
 	default:
 		return errors.New("unknown status code " + res.Status)
 	}

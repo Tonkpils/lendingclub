@@ -1,7 +1,10 @@
 package lendingclub
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/shopspring/decimal"
 )
@@ -10,7 +13,33 @@ const (
 	accountsResource      = "/accounts/%d"
 	summaryEndpoint       = "/summary"
 	availableCashEndpoint = "/availablecash"
+	addFundsEndpoint      = "/funds/add"
 )
+
+type Time struct {
+	time.Time
+}
+
+const timeFormat = "2006-01-02T15:04:05.999-0700"
+
+func (lct *Time) UnmarshalJSON(b []byte) error {
+	if b[0] == '"' && b[len(b)-1] == '"' {
+		b = b[1 : len(b)-1]
+	}
+
+	t, err := time.Parse(timeFormat, string(b))
+	if err != nil {
+		return err
+	}
+	*lct = Time{Time: t}
+
+	return nil
+}
+
+func (lct Time) MarshalJSON() ([]byte, error) {
+	ts := fmt.Sprintf("%q", lct.Format(timeFormat))
+	return []byte(ts), nil
+}
 
 type AccountsResource struct {
 	client   *Client
@@ -79,4 +108,41 @@ func (ar *AccountsResource) Summary() (*Summary, error) {
 	}
 
 	return &sum, nil
+}
+
+type FundsPayload struct {
+	Amount            decimal.Decimal `json:"amount"`
+	TransferFrequency string          `json:"transferFrequency"`
+	StartDate         *Time           `json:"startDate,omitempty"`
+	EndDate           *Time           `json:"endDate,omitempty"`
+}
+
+type FundsResponse struct {
+	FundsPayload
+	InvestorID                 int  `json:"investorId"`
+	EstimatedFundsTransferDate Time `json:"estimatedFundsTransferDate"`
+}
+
+func (ar *AccountsResource) AddFunds(fundTransfer *FundsPayload) (*FundsResponse, error) {
+	payload, err := json.Marshal(fundTransfer)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := ar.client.newRequest("POST", ar.endpoint+addFundsEndpoint, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ar.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var fr FundsResponse
+	if err := ar.client.processResponse(res, &fr); err != nil {
+		return nil, err
+	}
+
+	return &fr, nil
 }
