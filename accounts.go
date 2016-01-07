@@ -14,6 +14,7 @@ const (
 	summaryEndpoint       = "/summary"
 	availableCashEndpoint = "/availablecash"
 	addFundsEndpoint      = "/funds/add"
+	withdrawFundsEndpoint = "/funds/withdraw"
 )
 
 type Time struct {
@@ -145,4 +146,39 @@ func (ar *AccountsResource) AddFunds(fundTransfer *FundsPayload) (*Deposit, erro
 	}
 
 	return &deposit, nil
+}
+
+type Withdrawal struct {
+	Amount                     decimal.Decimal `json:"amount"`
+	InvestorID                 int             `json:"investorId"`
+	EstimatedFundsTransferDate Time            `json:"estimatedFundsTransferDate"`
+}
+
+func (ar *AccountsResource) WithdrawFunds(amount decimal.Decimal) (*Withdrawal, error) {
+	withdrawal := struct {
+		Amount decimal.Decimal `json:"amount"`
+	}{
+		Amount: amount,
+	}
+	payload, err := json.Marshal(withdrawal)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := ar.client.newRequest("POST", ar.endpoint+withdrawFundsEndpoint, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ar.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var wd Withdrawal
+	if err := ar.client.processResponse(res, &wd); err != nil {
+		return nil, err
+	}
+
+	return &wd, nil
 }
