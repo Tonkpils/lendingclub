@@ -117,13 +117,13 @@ type FundsPayload struct {
 	EndDate           *Time           `json:"endDate,omitempty"`
 }
 
-type FundsResponse struct {
+type Deposit struct {
 	FundsPayload
 	InvestorID                 int  `json:"investorId"`
 	EstimatedFundsTransferDate Time `json:"estimatedFundsTransferDate"`
 }
 
-func (ar *AccountsResource) AddFunds(fundTransfer *FundsPayload) (*FundsResponse, error) {
+func (ar *AccountsResource) AddFunds(fundTransfer *FundsPayload) (*Deposit, error) {
 	payload, err := json.Marshal(fundTransfer)
 	if err != nil {
 		return nil, err
@@ -139,10 +139,10 @@ func (ar *AccountsResource) AddFunds(fundTransfer *FundsPayload) (*FundsResponse
 		return nil, err
 	}
 
-	var fr FundsResponse
-	if err := ar.client.processResponse(res, &fr); err != nil {
+	var deposit Deposit
+	if err := ar.client.processResponse(res, &deposit); err != nil {
 		return nil, err
 	}
 
-	return &fr, nil
+	return &deposit, nil
 }
