@@ -48,9 +48,9 @@ func (c *Client) newRequest(method, urlStr string, body io.Reader) (*http.Reques
 		return nil, err
 	}
 
-	req.Header.Set("UserAgent", userAgent)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Authorization", c.authToken)
-	req.Header.Set("ContentType", contentType)
+	req.Header.Set("Content-Type", contentType)
 
 	return req, nil
 }
