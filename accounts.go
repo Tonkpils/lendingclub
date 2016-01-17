@@ -18,6 +18,7 @@ const (
 	pendingFundsEndpoint  = "/funds/pending"
 	cancelFundsEndpoint   = "/funds/cancel"
 	notesEndpoint         = "/notes"
+	portfoliosEndpoint    = "/portfolios"
 )
 
 type Time struct {
@@ -265,7 +266,8 @@ func (ar *AccountsResource) CancelFunds(transferIds []int) (*CancellationResult,
 }
 
 type Note struct {
-	LoanID           decimal.Decimal `json:"loanId"`
+	LoanID decimal.Decimal `json:"loanId"`
+	// TODO fix this to be ID and noteId
 	NoteID           decimal.Decimal `json:"nodeId"`
 	OrderID          decimal.Decimal `json:"orderId"`
 	InterestRate     decimal.Decimal `json:"interestRate"`
@@ -281,6 +283,7 @@ type Note struct {
 	LoanStatusDate Time `json:"loanStatusDate"`
 }
 
+// TODO: Detailed Notes Owned
 func (ar *AccountsResource) Notes() ([]Note, error) {
 	req, err := ar.client.newRequest("GET", ar.endpoint+notesEndpoint, nil)
 	if err != nil {
@@ -300,4 +303,31 @@ func (ar *AccountsResource) Notes() ([]Note, error) {
 	}
 
 	return myNotes.Notes, nil
+}
+
+type Portfolio struct {
+	ID          int    `json:"portfolioId"`
+	Name        string `json:"portfolioName"`
+	Description string `json:"portfolioDescription"`
+}
+
+func (ar *AccountsResource) Portfolios() ([]Portfolio, error) {
+	req, err := ar.client.newRequest("GET", ar.endpoint+portfoliosEndpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ar.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var myPortfolios struct {
+		Portfolios []Portfolio `json:"myPortfolios"`
+	}
+	if err := ar.client.processResponse(res, &myPortfolios); err != nil {
+		return nil, err
+	}
+
+	return myPortfolios.Portfolios, nil
 }
