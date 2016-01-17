@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/shopspring/decimal"
 )
 
 const (
-	accountsResource      = "/accounts/%d"
+	accountsResourcePath  = "/accounts/%d"
 	summaryEndpoint       = "/summary"
 	availableCashEndpoint = "/availablecash"
 	addFundsEndpoint      = "/funds/add"
@@ -22,31 +21,6 @@ const (
 	ordersEndpoint        = "/oders"
 )
 
-type Time struct {
-	time.Time
-}
-
-const timeFormat = "2006-01-02T15:04:05.999-0700"
-
-func (lct *Time) UnmarshalJSON(b []byte) error {
-	if b[0] == '"' && b[len(b)-1] == '"' {
-		b = b[1 : len(b)-1]
-	}
-
-	t, err := time.Parse(timeFormat, string(b))
-	if err != nil {
-		return err
-	}
-	*lct = Time{Time: t}
-
-	return nil
-}
-
-func (lct Time) MarshalJSON() ([]byte, error) {
-	ts := fmt.Sprintf("%q", lct.Format(timeFormat))
-	return []byte(ts), nil
-}
-
 type AccountsResource struct {
 	client   *Client
 	endpoint string
@@ -55,7 +29,7 @@ type AccountsResource struct {
 func (c *Client) Accounts(investorID int) *AccountsResource {
 	return &AccountsResource{
 		client:   c,
-		endpoint: fmt.Sprintf(lendingClubAPI+accountsResource, investorID),
+		endpoint: fmt.Sprintf(lendingClubAPIURL+accountsResourcePath, investorID),
 	}
 }
 
@@ -363,10 +337,10 @@ type OrderSubmission struct {
 }
 
 type OrderConfirmation struct {
-	LoanID          int            `json:"loanId"`
-	RequestedAmount decima.Decimal `json:"requestedAmount"`
-	InvestedAmount  int            `json:"investedAmount"`
-	ExecutionStatus string         `json:"executionStatus"`
+	LoanID          int             `json:"loanId"`
+	RequestedAmount decimal.Decimal `json:"requestedAmount"`
+	InvestedAmount  int             `json:"investedAmount"`
+	ExecutionStatus string          `json:"executionStatus"`
 }
 
 type OrderInstruct struct {

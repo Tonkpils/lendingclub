@@ -3,10 +3,12 @@ package lendingclub
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 const (
@@ -17,7 +19,7 @@ const (
 )
 
 const (
-	lendingClubAPI = "https://api.lendingclub.com/api/investor/" + apiVersion
+	lendingClubAPIURL = "https://api.lendingclub.com/api/investor/" + apiVersion
 )
 
 type Client struct {
@@ -88,4 +90,29 @@ func (c *Client) processResponse(res *http.Response, body interface{}) error {
 	}
 
 	return nil
+}
+
+type Time struct {
+	time.Time
+}
+
+const timeFormat = "2006-01-02T15:04:05.999-07:00"
+
+func (lct *Time) UnmarshalJSON(b []byte) error {
+	if b[0] == '"' && b[len(b)-1] == '"' {
+		b = b[1 : len(b)-1]
+	}
+
+	t, err := time.Parse(timeFormat, string(b))
+	if err != nil {
+		return err
+	}
+	*lct = Time{Time: t}
+
+	return nil
+}
+
+func (lct Time) MarshalJSON() ([]byte, error) {
+	ts := fmt.Sprintf("%q", lct.Format(timeFormat))
+	return []byte(ts), nil
 }
