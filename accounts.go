@@ -305,9 +305,9 @@ func (ar *AccountsResource) Notes() ([]Note, error) {
 }
 
 type Portfolio struct {
-	ID          int    `json:"portfolioId"`
+	ID          int    `json:"portfolioId,omitempty"`
 	Name        string `json:"portfolioName"`
-	Description string `json:"portfolioDescription"`
+	Description string `json:"portfolioDescription,omitempty"`
 }
 
 func (ar *AccountsResource) Portfolios() ([]Portfolio, error) {
@@ -329,4 +329,28 @@ func (ar *AccountsResource) Portfolios() ([]Portfolio, error) {
 	}
 
 	return myPortfolios.Portfolios, nil
+}
+
+func (ar *AccountsResource) CreatePortfolio(name, description string) (*Portfolio, error) {
+	payload, err := json.Marshal(Portfolio{Name: name, Description: description})
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := ar.client.newRequest("POST", ar.endpoint+portfoliosEndpoint, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ar.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var portfolio Portfolio
+	if err := ar.client.processResponse(res, &portfolio); err != nil {
+		return nil, err
+	}
+
+	return &portfolio, nil
 }
