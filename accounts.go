@@ -17,6 +17,7 @@ const (
 	withdrawFundsEndpoint = "/funds/withdraw"
 	pendingFundsEndpoint  = "/funds/pending"
 	cancelFundsEndpoint   = "/funds/cancel"
+	notesEndpoint         = "/notes"
 )
 
 type Time struct {
@@ -261,4 +262,42 @@ func (ar *AccountsResource) CancelFunds(transferIds []int) (*CancellationResult,
 	}
 
 	return &cr, nil
+}
+
+type Note struct {
+	LoanID           decimal.Decimal `json:"loanId"`
+	NoteID           decimal.Decimal `json:"nodeId"`
+	OrderID          decimal.Decimal `json:"orderId"`
+	InterestRate     decimal.Decimal `json:"interestRate"`
+	LoanStatus       string          `json:"loanStatus"`
+	Grade            string          `json:"grade"`
+	LoanAmount       decimal.Decimal `json:"loanAmount"`
+	NoteAmount       decimal.Decimal `json:"noteAmount"`
+	LoanLength       int             `json:"loanLength"`
+	OrderDate        Time            `json:"orderDate"`
+	PaymentsReceived decimal.Decimal `json:"paymentsReceived"`
+	// TODO: this may be nullable so Time should be a pointer
+	IssueDate      Time `json:"issueDate"`
+	LoanStatusDate Time `json:"loanStatusDate"`
+}
+
+func (ar *AccountsResource) Notes() ([]Note, error) {
+	req, err := ar.client.newRequest("GET", ar.endpoint+notesEndpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ar.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var myNotes struct {
+		Notes []Note `json:"myNotes"`
+	}
+	if err := ar.client.processResponse(res, &myNotes); err != nil {
+		return nil, err
+	}
+
+	return myNotes.Notes, nil
 }
