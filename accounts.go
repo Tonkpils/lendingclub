@@ -19,6 +19,7 @@ const (
 	cancelFundsEndpoint   = "/funds/cancel"
 	notesEndpoint         = "/notes"
 	portfoliosEndpoint    = "/portfolios"
+	ordersEndpoint        = "/oders"
 )
 
 type Time struct {
@@ -353,4 +354,54 @@ func (ar *AccountsResource) CreatePortfolio(name, description string) (*Portfoli
 	}
 
 	return &portfolio, nil
+}
+
+type OrderSubmission struct {
+	LoanID      int             `json:"loanId"`
+	Amount      decimal.Decimal `json:"requestedAmount"`
+	PortfolioID int             `json:"portfolioId,omitempty"`
+}
+
+type OrderConfirmation struct {
+	LoanID          int            `json:"loanId"`
+	RequestedAmount decima.Decimal `json:"requestedAmount"`
+	InvestedAmount  int            `json:"investedAmount"`
+	ExecutionStatus string         `json:"executionStatus"`
+}
+
+type OrderInstruct struct {
+	ID                 int                 `json:"orderInstructId"`
+	OrderConfirmations []OrderConfirmation `json:"orderConfirmations"`
+}
+
+func (ar *AccountsResource) SubmitOrder(accountID int, orders []OrderSubmission) (*OrderInstruct, error) {
+	orderSubmission := struct {
+		Orders    []OrderSubmission `json:"orders"`
+		AccountID int               `json:"aid"`
+	}{
+		Orders:    orders,
+		AccountID: accountID,
+	}
+
+	payload, err := json.Marshal(orderSubmission)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := ar.client.newRequest("POST", ar.endpoint+ordersEndpoint, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ar.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var orderInstruct OrderInstruct
+	if err := ar.client.processResponse(res, &orderInstruct); err != nil {
+		return nil, err
+	}
+
+	return &orderInstruct, nil
 }
