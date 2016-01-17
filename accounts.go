@@ -266,15 +266,14 @@ func (ar *AccountsResource) CancelFunds(transferIds []int) (*CancellationResult,
 }
 
 type Note struct {
-	LoanID decimal.Decimal `json:"loanId"`
-	// TODO fix this to be ID and noteId
-	NoteID           decimal.Decimal `json:"nodeId"`
+	ID               decimal.Decimal `json:"noteId"`
+	Amount           decimal.Decimal `json:"noteAmount"`
+	LoanID           decimal.Decimal `json:"loanId"`
 	OrderID          decimal.Decimal `json:"orderId"`
 	InterestRate     decimal.Decimal `json:"interestRate"`
 	LoanStatus       string          `json:"loanStatus"`
 	Grade            string          `json:"grade"`
 	LoanAmount       decimal.Decimal `json:"loanAmount"`
-	NoteAmount       decimal.Decimal `json:"noteAmount"`
 	LoanLength       int             `json:"loanLength"`
 	OrderDate        Time            `json:"orderDate"`
 	PaymentsReceived decimal.Decimal `json:"paymentsReceived"`
