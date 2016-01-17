@@ -16,6 +16,7 @@ const (
 	addFundsEndpoint      = "/funds/add"
 	withdrawFundsEndpoint = "/funds/withdraw"
 	pendingFundsEndpoint  = "/funds/pending"
+	cancelFundsEndpoint   = "/funds/cancel"
 )
 
 type Time struct {
@@ -220,4 +221,44 @@ func (ar *AccountsResource) PendingFunds() ([]Transfer, error) {
 	}
 
 	return transfers, nil
+}
+
+type CancellationResult struct {
+	InvestorID    int            `json:"investorId"`
+	Cancellations []Cancellation `json:"cancellationResults"`
+}
+
+type Cancellation struct {
+	TransferID int    `json:"transferId"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+}
+
+func (ar *AccountsResource) CancelFunds(transferIds []int) (*CancellationResult, error) {
+	transfers := struct {
+		TransferIDs []int `json:"transferIds"`
+	}{
+		TransferIDs: transferIds,
+	}
+	payload, err := json.Marshal(transfers)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := ar.client.newRequest("POST", ar.endpoint+cancelFundsEndpoint, bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ar.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var cr CancellationResult
+	if err := ar.client.processResponse(res, &cr); err != nil {
+		return nil, err
+	}
+
+	return &cr, nil
 }
