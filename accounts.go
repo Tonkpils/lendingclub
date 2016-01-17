@@ -15,6 +15,7 @@ const (
 	availableCashEndpoint = "/availablecash"
 	addFundsEndpoint      = "/funds/add"
 	withdrawFundsEndpoint = "/funds/withdraw"
+	pendingFundsEndpoint  = "/funds/pending"
 )
 
 type Time struct {
@@ -181,4 +182,42 @@ func (ar *AccountsResource) WithdrawFunds(amount decimal.Decimal) (*Withdrawal, 
 	}
 
 	return &wd, nil
+}
+
+type Transfer struct {
+	TransferID    int             `json:"transferId"`
+	TransferDate  Time            `json:"transferDate"`
+	Amount        decimal.Decimal `json:"amount"`
+	SourceAccount string          `json:"sourceAccount"`
+	Status        string          `json:"status"`
+	Frequency     string          `json:"frequency"`
+	EndDate       Time            `json:"endDate"`
+	Operation     string          `json:"operation"`
+	Cancellable   bool            `json:"cancellable"`
+}
+
+func (ar *AccountsResource) PendingFunds() ([]Transfer, error) {
+	req, err := ar.client.newRequest("GET", ar.endpoint+pendingFundsEndpoint, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := ar.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	var respPayload struct {
+		Transfers map[int]Transfer `json:"transfers"`
+	}
+	if err := ar.client.processResponse(res, &respPayload); err != nil {
+		return nil, err
+	}
+
+	transfers := make([]Transfer, len(respPayload.Transfers))
+	for _, transfer := range respPayload.Transfers {
+		transfers = append(transfers, transfer)
+	}
+
+	return transfers, nil
 }
