@@ -18,7 +18,7 @@ const (
 	cancelFundsEndpoint   = "/funds/cancel"
 	notesEndpoint         = "/notes"
 	portfoliosEndpoint    = "/portfolios"
-	ordersEndpoint        = "/oders"
+	ordersEndpoint        = "/orders"
 )
 
 type AccountsResource struct {
