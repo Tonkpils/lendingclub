@@ -1,4 +1,4 @@
-# Lending Club
+# Lending Club [![Build Status](https://travis-ci.org/Tonkpils/lendingclub.svg?branch=master)](https://travis-ci.org/Tonkpils/lendingclub)
 
 Go client for the Lending Club API.
 
