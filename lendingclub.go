@@ -25,6 +25,7 @@ const (
 type Client struct {
 	*http.Client
 	authToken string
+	baseURL   string
 }
 
 type ErrorResponse struct {
@@ -38,10 +39,19 @@ type APIError struct {
 }
 
 func NewClient(authToken string, client *http.Client) *Client {
+	return newClient(lendingClubAPIURL, authToken, client)
+}
+
+func newClient(baseURL, authToken string, client *http.Client) *Client {
 	if client == nil {
 		client = http.DefaultClient
 	}
-	return &Client{Client: client, authToken: authToken}
+
+	return &Client{
+		Client:    client,
+		baseURL:   baseURL,
+		authToken: authToken,
+	}
 }
 
 func (c *Client) newRequest(method, urlStr string, body io.Reader) (*http.Request, error) {

@@ -29,7 +29,7 @@ type AccountsResource struct {
 func (c *Client) Accounts(investorID int) *AccountsResource {
 	return &AccountsResource{
 		client:   c,
-		endpoint: fmt.Sprintf(lendingClubAPIURL+accountsResourcePath, investorID),
+		endpoint: fmt.Sprintf(c.baseURL+accountsResourcePath, investorID),
 	}
 }
 

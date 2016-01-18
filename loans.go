@@ -1,10 +1,6 @@
 package lendingclub
 
-import (
-	"fmt"
-
-	"github.com/shopspring/decimal"
-)
+import "github.com/shopspring/decimal"
 
 const (
 	loansResourcePath   = "/loans"
@@ -19,7 +15,7 @@ type LoansResource struct {
 func (c *Client) Loans() *LoansResource {
 	return &LoansResource{
 		client:   c,
-		endpoint: fmt.Sprintf(lendingClubAPIURL + loansResourcePath),
+		endpoint: c.baseURL + loansResourcePath,
 	}
 }
 
