@@ -50,11 +50,9 @@ func (ar *AccountsResource) AvailableCash() (*AvailableCash, error) {
 	}
 
 	var ac AvailableCash
-	if err := ar.client.processResponse(res, &ac); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &ac)
 
-	return &ac, nil
+	return &ac, err
 }
 
 type Summary struct {
@@ -83,11 +81,9 @@ func (ar *AccountsResource) Summary() (*Summary, error) {
 	}
 
 	var sum Summary
-	if err := ar.client.processResponse(res, &sum); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &sum)
 
-	return &sum, nil
+	return &sum, err
 }
 
 type FundsPayload struct {
@@ -120,11 +116,9 @@ func (ar *AccountsResource) AddFunds(fundTransfer *FundsPayload) (*Deposit, erro
 	}
 
 	var deposit Deposit
-	if err := ar.client.processResponse(res, &deposit); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &deposit)
 
-	return &deposit, nil
+	return &deposit, err
 }
 
 type Withdrawal struct {
@@ -155,11 +149,9 @@ func (ar *AccountsResource) WithdrawFunds(amount decimal.Decimal) (*Withdrawal, 
 	}
 
 	var wd Withdrawal
-	if err := ar.client.processResponse(res, &wd); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &wd)
 
-	return &wd, nil
+	return &wd, err
 }
 
 type Transfer struct {
@@ -233,11 +225,9 @@ func (ar *AccountsResource) CancelFunds(transferIds []int) (*CancellationResult,
 	}
 
 	var cr CancellationResult
-	if err := ar.client.processResponse(res, &cr); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &cr)
 
-	return &cr, nil
+	return &cr, err
 }
 
 type Note struct {
@@ -272,11 +262,9 @@ func (ar *AccountsResource) Notes() ([]Note, error) {
 	var myNotes struct {
 		Notes []Note `json:"myNotes"`
 	}
-	if err := ar.client.processResponse(res, &myNotes); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &myNotes)
 
-	return myNotes.Notes, nil
+	return myNotes.Notes, err
 }
 
 type Portfolio struct {
@@ -299,11 +287,9 @@ func (ar *AccountsResource) Portfolios() ([]Portfolio, error) {
 	var myPortfolios struct {
 		Portfolios []Portfolio `json:"myPortfolios"`
 	}
-	if err := ar.client.processResponse(res, &myPortfolios); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &myPortfolios)
 
-	return myPortfolios.Portfolios, nil
+	return myPortfolios.Portfolios, err
 }
 
 func (ar *AccountsResource) CreatePortfolio(name, description string) (*Portfolio, error) {
@@ -323,11 +309,9 @@ func (ar *AccountsResource) CreatePortfolio(name, description string) (*Portfoli
 	}
 
 	var portfolio Portfolio
-	if err := ar.client.processResponse(res, &portfolio); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &portfolio)
 
-	return &portfolio, nil
+	return &portfolio, err
 }
 
 type OrderSubmission struct {
@@ -373,9 +357,7 @@ func (ar *AccountsResource) SubmitOrder(accountID int, orders []OrderSubmission)
 	}
 
 	var orderInstruct OrderInstruct
-	if err := ar.client.processResponse(res, &orderInstruct); err != nil {
-		return nil, err
-	}
+	err = ar.client.processResponse(res, &orderInstruct)
 
-	return &orderInstruct, nil
+	return &orderInstruct, err
 }

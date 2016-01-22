@@ -142,9 +142,7 @@ func (lr *LoansResource) Listed() (*Loans, error) {
 	}
 
 	var loans Loans
-	if err := lr.client.processResponse(res, &loans); err != nil {
-		return nil, err
-	}
+	err = lr.client.processResponse(res, &loans)
 
-	return &loans, nil
+	return &loans, err
 }
