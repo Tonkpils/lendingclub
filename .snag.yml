@@ -1,0 +1,11 @@
+verbose: true
+
+ignore:
+  - .git
+  - lendingclub
+
+script:
+  - go build
+  - go vet
+  - gofmt -l -s .
+  - go test ./... -v
