@@ -95,8 +95,9 @@ type FundsPayload struct {
 
 type Deposit struct {
 	FundsPayload
-	InvestorID                 int  `json:"investorId"`
-	EstimatedFundsTransferDate Time `json:"estimatedFundsTransferDate"`
+	InvestorID                 int    `json:"investorId"`
+	Frequency                  string `json:"frequency"`
+	EstimatedFundsTransferDate Time   `json:"estimatedFundsTransferDate"`
 }
 
 func (ar *AccountsResource) AddFunds(fundTransfer *FundsPayload) (*Deposit, error) {

@@ -1,0 +1,8 @@
+{
+	"investorId": 12345,
+	"amount": 100,
+	"frequency": "LOAD_NOW",
+	"startDate": "2015-01-22T00:00:00.000-0800",
+	"endDate": null,
+	"estimatedFundsTransferDate": "2015-01-22T00:00:00.000-0800"
+}

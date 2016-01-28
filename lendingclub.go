@@ -106,7 +106,7 @@ type Time struct {
 	time.Time
 }
 
-const timeFormat = "2006-01-02T15:04:05.999-07:00"
+const timeFormat = "2006-01-02T15:04:05.999-0700"
 
 func (lct *Time) UnmarshalJSON(b []byte) error {
 	if b[0] == '"' && b[len(b)-1] == '"' {
