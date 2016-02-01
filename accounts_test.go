@@ -99,3 +99,35 @@ func TestAddFunds(t *testing.T) {
 	assert.Nil(t, deposit.EndDate)
 	assert.Equal(t, ti, deposit.EstimatedFundsTransferDate.Time)
 }
+
+func TestWithdrawFunds(t *testing.T) {
+	amount := decimal.NewFromFloat(100.0)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		defer req.Body.Close()
+		withdrawFundsAPI := fmt.Sprintf("/accounts/%d/funds/withdraw", TestAccountID)
+		assert.Equal(t, withdrawFundsAPI, req.RequestURI)
+
+		var body struct {
+			Amount decimal.Decimal `json:"amount"`
+		}
+		err := json.NewDecoder(req.Body).Decode(&body)
+		require.NoError(t, err)
+
+		assert.Equal(t, amount, body.Amount)
+
+		err = respondWithFixture(w, "withdraw_funds.json")
+		require.NoError(t, err)
+	}))
+	defer ts.Close()
+
+	ar := newClient(ts.URL, "Token", nil).Accounts(TestAccountID)
+	withdrawal, err := ar.WithdrawFunds(amount)
+	require.NoError(t, err)
+
+	ti, err := time.Parse(timeFormat, "2015-01-22T00:00:00.000-0800")
+	require.NoError(t, err)
+
+	assert.Equal(t, amount, withdrawal.Amount)
+	assert.Equal(t, 12345, withdrawal.InvestorID)
+	assert.Equal(t, ti, withdrawal.EstimatedFundsTransferDate.Time)
+}
