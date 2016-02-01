@@ -1,3 +1,8 @@
+/*
+Go wrapper for the Lending Club API.
+
+See https://www.lendingclub.com/developers/lc-api.action for more details on the API.
+*/
 package lendingclub
 
 import (
