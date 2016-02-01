@@ -4,8 +4,9 @@ ignore:
   - .git
   - lendingclub
 
-script:
+build:
   - go build
   - go vet
   - gofmt -l -s .
+  - golint
   - go test ./... -v
