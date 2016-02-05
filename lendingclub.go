@@ -43,6 +43,8 @@ type APIError struct {
 	Message string `json:"message"`
 }
 
+// NewClient creates a new Client with the given auth token and an optional
+// *http.Client. If the *http.Client is nil, http.DefaultClient will be used.
 func NewClient(authToken string, client *http.Client) *Client {
 	return newClient(lendingClubAPIURL, authToken, client)
 }
@@ -107,6 +109,8 @@ func (c *Client) processResponse(res *http.Response, body interface{}) error {
 	return nil
 }
 
+// Time wraps time.Time to provide un/marshaling JSON functionality
+// for lendingclub's time format.
 type Time struct {
 	time.Time
 }
